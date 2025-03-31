@@ -12,13 +12,15 @@ import yaml
 from gymnasium import spaces
 from huggingface_hub import HfApi
 from huggingface_sb3 import EnvironmentName, ModelName
-from sb3_contrib import ARS, QRDQN, TQC, TRPO, CrossQ, RecurrentPPO
+from sb3_contrib import ARS, QRDQN, TQC, TRPO, CrossQ, MaskablePPO, RecurrentPPO
 from stable_baselines3 import A2C, DDPG, DQN, PPO, SAC, TD3
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize
+
+# from sb3_contrib import MaskablePPO as PPO
 
 # For custom activation fn
 from torch import nn as nn
@@ -27,7 +29,7 @@ ALGOS: dict[str, type[BaseAlgorithm]] = {
     "a2c": A2C,
     "ddpg": DDPG,
     "dqn": DQN,
-    "ppo": PPO,
+    "ppo": MaskablePPO,
     "sac": SAC,
     "td3": TD3,
     # SB3 Contrib,

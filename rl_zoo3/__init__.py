@@ -16,6 +16,8 @@ from rl_zoo3.utils import (
     linear_schedule,
 )
 
+from rl_zoo3 import custom_feature_extractor
+
 # Read version from file
 version_file = os.path.join(os.path.dirname(__file__), "version.txt")
 with open(version_file) as file_handler:
@@ -29,4 +31,5 @@ __all__ = [
     "get_trained_models",
     "get_wrapper_class",
     "linear_schedule",
+    "custom_feature_extractor"
 ]

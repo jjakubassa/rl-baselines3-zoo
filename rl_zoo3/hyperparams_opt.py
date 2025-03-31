@@ -43,11 +43,15 @@ def convert_onpolicy_params(sampled_params: dict[str, Any]) -> dict[str, Any]:
         "leaky_relu": nn.LeakyReLU,
     }[activation_fn_name]
 
-    return {
-        "policy_kwargs": {
+    policy_kwargs = hyperparams.get("policy_kwargs", {})
+    policy_kwargs.update(
+        {
             "net_arch": net_arch,
             "activation_fn": activation_fn,
-        },
+        })
+
+    return {
+        "policy_kwargs": policy_kwargs,
         **hyperparams,
     }
 
@@ -149,6 +153,7 @@ def sample_ppo_params(trial: optuna.Trial, n_actions: int, n_envs: int, addition
         "max_grad_norm": max_grad_norm,
         "net_arch": net_arch,
         "activation_fn": activation_fn,
+        **additional_args
     }
 
     return convert_onpolicy_params(sampled_params)

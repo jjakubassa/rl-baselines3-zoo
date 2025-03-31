@@ -52,7 +52,6 @@ from rl_zoo3.callbacks import SaveVecNormalizeCallback, TrialEvalCallback
 from rl_zoo3.hyperparams_opt import HYPERPARAMS_CONVERTER, HYPERPARAMS_SAMPLER
 from rl_zoo3.utils import ALGOS, get_callback_list, get_class_by_name, get_latest_run_id, get_wrapper_class, linear_schedule
 
-
 class ExperimentManager:
     """
     Experiment manager: read the hyperparameters,
@@ -189,6 +188,7 @@ class ExperimentManager:
             self.log_path, f"{self.env_name}_{get_latest_run_id(self.log_path, self.env_name) + 1}{uuid_str}"
         )
         self.params_path = f"{self.save_path}/{self.env_name}"
+
 
     def setup_experiment(self) -> Optional[tuple[BaseAlgorithm, dict[str, Any]]]:
         """
@@ -470,6 +470,7 @@ class ExperimentManager:
         if "frame_stack" in hyperparams.keys():
             self.frame_stack = hyperparams["frame_stack"]
             del hyperparams["frame_stack"]
+
 
         # import the policy when using a custom policy
         if "policy" in hyperparams and "." in hyperparams["policy"]:
@@ -775,8 +776,9 @@ class ExperimentManager:
         n_envs = 1 if self.algo == "ars" else self.n_envs
 
         additional_args = {
-            "using_her_replay_buffer": kwargs.get("replay_buffer_class") == HerReplayBuffer,
-            "her_kwargs": kwargs.get("replay_buffer_kwargs", {}),
+            # "using_her_replay_buffer": kwargs.get("replay_buffer_class") == HerReplayBuffer,
+            # "her_kwargs": kwargs.get("replay_buffer_kwargs", {}),
+            "policy_kwargs": kwargs.get("policy_kwargs", {})
         }
         # Pass n_actions to initialize DDPG/TD3 noise sampler
         # Sample candidate hyperparameters
