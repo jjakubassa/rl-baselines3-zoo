@@ -596,7 +596,7 @@ CederFix-v0: &ceder-default
         "ratio_travel_time_direct_to_shortest_path",
         "ratio_travel_time_transfers_to_shortest_path",))
     normalize: "{'norm_obs': False, 'norm_reward': True, 'gamma': 0.99, 'epsilon': 1e-8}"
-    n_envs: 8
+    n_envs: 80
     n_timesteps: !!float 5e6
     policy: "MultiInputPolicy"
     n_steps: 150
@@ -619,15 +619,19 @@ CederFix-v0: &ceder-default
 
 CederFlex-v0:
     <<: *ceder-default
+    n_envs: 60
 
 CederReplace-v0:
     <<: *ceder-default
+    n_envs: 60
 
 MandlFix-v0:
     <<: *ceder-default
 
 MandlFlex-v0:
     <<: *ceder-default
+    n_envs: 20
 
 MandlReplace-v0:
     <<: *ceder-default
+    n_envs: 20

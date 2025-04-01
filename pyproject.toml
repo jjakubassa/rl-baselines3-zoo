@@ -45,6 +45,7 @@ dependencies = [
     "pytablewriter>=1.2.1",
     "seaborn>=0.13.2",
     "stable-baselines3[docs,extra,tests]>=2.6.0,<3.0",
+    "submitit>=1.5.2",
     "wandb>=0.19.8",
 ]
 
