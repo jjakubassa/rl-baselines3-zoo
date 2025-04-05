@@ -631,3 +631,6 @@ MandlFlex-v0:
 
 MandlReplace-v0:
     <<: *ceder-default
+
+Mumford0Fix-v0:
+    <<: *ceder-default
