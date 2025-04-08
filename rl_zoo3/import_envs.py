@@ -141,6 +141,7 @@ gym.register(
         num_flex_routes = 0,
         max_route_length = 8,
         total_vehicles = 99,
+        vehicles_per_additional_fixed_route = (14, 26, 29, 30),
         **kwargs
     ),
 )

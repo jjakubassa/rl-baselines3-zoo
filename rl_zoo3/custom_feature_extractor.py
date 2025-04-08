@@ -30,19 +30,19 @@ class MandlFeaturesExtractor(BaseFeaturesExtractor):
         self.eps = 1e-8
 
         # Calculate expected feature sizes
-        self.num_routes = observation_space.spaces["route_frequencies"].shape[0]  # 12
-        self.num_nodes = observation_space.spaces["is_terminal"].shape[0]  # 15
-        self.num_vehicles = observation_space.spaces["fleet_positions"].shape[0] // 2  # 12
+        self.num_routes = observation_space.spaces["route_frequencies"].shape[0]
+        self.num_nodes = observation_space.spaces["is_terminal"].shape[0]
+        self.num_vehicles = observation_space.spaces["fleet_positions"].shape[0]
         self.max_route_length = observation_space.spaces["route_stops"].shape[0] // self.num_routes  # 8
 
         # Calculate input sizes
-        action_mask_size = self.num_routes * (self.num_nodes + 1)  # 192 for your case
-        travel_times_size = self.num_nodes * self.num_nodes  # 225 for your case
-        route_stops_size = self.num_routes * self.max_route_length  # 96 for your case
-        fleet_positions_size = self.num_vehicles * 2  # 24 for your case
-        route_types_size = self.num_routes  # 12 for your case
-        route_frequencies_size = self.num_routes  # 12 for your case
-        is_terminal_size = self.num_nodes  # 15 for your case
+        action_mask_size = self.num_routes * (self.num_nodes + 1)
+        travel_times_size = self.num_nodes * self.num_nodes
+        route_stops_size = self.num_routes * self.max_route_length
+        fleet_positions_size = self.num_vehicles
+        route_types_size = self.num_routes
+        route_frequencies_size = self.num_routes
+        is_terminal_size = self.num_nodes
 
         # Define extractors with correct input sizes
         self.extractors = nn.ModuleDict({
