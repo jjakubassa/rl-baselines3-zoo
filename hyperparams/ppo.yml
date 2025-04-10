@@ -620,10 +620,16 @@ CederFix-v0: &ceder-default
 CederFlex-v0:
     <<: *ceder-default
 
+CederFixRandomFreq-v0:
+    <<: *ceder-default
+
 CederReplace-v0:
     <<: *ceder-default
 
 MandlFix-v0:
+    <<: *ceder-default
+
+MandlFixRandomFreq-v0:
     <<: *ceder-default
 
 MandlFlex-v0:

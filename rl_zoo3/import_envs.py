@@ -2,8 +2,6 @@ from typing import Callable, Optional
 
 import gymnasium as gym
 from gymnasium.envs.registration import EnvSpec, register, register_envs
-from jumanji.environments.routing.mandl import Mandl
-from jumanji.wrappers import JumanjiToGymWrapper
 
 from rl_zoo3.wrappers import MaskVelocityWrapper
 
@@ -73,130 +71,167 @@ for env_id in MaskVelocityWrapper.velocity_indices.keys():
         entry_point=create_no_vel_env(env_id),  # type: ignore[arg-type]
     )
 
-def make_env(**kwargs) -> gym.Env:
-
+try:
     from jumanji.environments.routing.mandl import Mandl
     from jumanji.wrappers import JumanjiToGymWrapper
 
-    default_kwargs = {
-        "network_name" : "mandl1",
-        "runtime" : 150.0,
-        "buffer_time_end" : 50.0,
-        "buffer_time_start" : 8,
-        "vehicle_capacity" : 50,
-        "solution_name" : None,  # None means no solution from file
-        "num_fix_routes" : 4,
-        "num_flex_routes" : 16,
-        "max_route_length" : 8,
-        "allow_actions_fixed_routes" : True,
-        "total_vehicles" : 99,
-        "vehicles_per_additional_fixed_route" : None,
-        "passenger_init_mode" : "evenly_spaced",
-    }
-    # Update defaults with any provided kwargs
-    default_kwargs.update(kwargs)
+    def make_env(**kwargs) -> gym.Env:
 
-    # Create and wrap the environment
-    env = JumanjiToGymWrapper(Mandl(**default_kwargs))
+        from jumanji.environments.routing.mandl import Mandl
+        from jumanji.wrappers import JumanjiToGymWrapper
+        from jumanji.environments.routing.mandl.generator import DefaultGenerator
 
-    # Set the environment spec
-    env.spec = EnvSpec(
-        id='Mandl-v0',
-        entry_point=make_env,
-        max_episode_steps=1000,
-        kwargs=default_kwargs
+        default_kwargs = {
+            "network_name" : "mandl1",
+            "runtime" : 150.0,
+            "buffer_time_end" : 50.0,
+            "buffer_time_start" : 8,
+            "vehicle_capacity" : 50,
+            "solution_name" : None,  # None means no solution from file
+            "num_fix_routes" : 4,
+            "num_flex_routes" : 16,
+            "max_route_length" : 8,
+            "allow_actions_fixed_routes" : True,
+            "total_vehicles" : 99,
+            "vehicles_per_additional_fixed_route" : None,
+            "passenger_init_mode" : "evenly_spaced",
+            "random_vehicle_allocation": False,
+        }
+        # Update defaults with any provided kwargs
+        default_kwargs.update(kwargs)
+
+        # Create and wrap the environment
+        generator = DefaultGenerator(**default_kwargs)
+        env = JumanjiToGymWrapper(Mandl(generator))
+
+        # Set the environment spec
+        env.spec = EnvSpec(
+            id='Mandl-v0',
+            entry_point=make_env,
+            max_episode_steps=1000,
+            kwargs=default_kwargs
+        )
+
+        return env
+
+    gym.register(
+        id='CederFix-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name="ceder1",
+            num_flex_routes=0,
+            num_fix_routes=3,
+            max_route_length=3,
+            total_vehicles=12,
+            **kwargs
+        ),
     )
 
-    return env
+    gym.register(
+        id='CederFixRandomFreq-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name="ceder1",
+            num_flex_routes=0,
+            num_fix_routes=3,
+            max_route_length=3,
+            total_vehicles=12,
+            vehicles_per_additional_fixed_route = None,
+            random_vehicle_allocation = True,
+            **kwargs
+        ),
+    )
 
-gym.register(
-    id='CederFix-v0',
-    entry_point=lambda **kwargs: make_env(
-        network_name="ceder1",
-        num_flex_routes=0,
-        num_fix_routes=3,
-        max_route_length=3,
-        total_vehicles=12,
-        **kwargs
-    ),
-)
+    gym.register(
+        id='CederFlex-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name="ceder1",
+            num_flex_routes=12,
+            num_fix_routes=0,
+            max_route_length=30,
+            total_vehicles=12,
+            **kwargs
+        ),
+    )
 
-gym.register(
-    id='CederFlex-v0',
-    entry_point=lambda **kwargs: make_env(
-        network_name="ceder1",
-        num_flex_routes=12,
-        num_fix_routes=0,
-        max_route_length=30,
-        total_vehicles=12,
-        **kwargs
-    ),
-)
+    gym.register(
+        id='MandlFix-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name = "mandl1",
+            num_fix_routes = 4,
+            num_flex_routes = 0,
+            max_route_length = 8,
+            total_vehicles = 99,
+            vehicles_per_additional_fixed_route = (14, 26, 29, 30),
+            **kwargs
+        ),
+    )
 
-gym.register(
-    id='MandlFix-v0',
-    entry_point=lambda **kwargs: make_env(
-        network_name = "mandl1",
-        num_fix_routes = 4,
-        num_flex_routes = 0,
-        max_route_length = 8,
-        total_vehicles = 99,
-        vehicles_per_additional_fixed_route = (14, 26, 29, 30),
-        **kwargs
-    ),
-)
+    gym.register(
+        id='MandlFixRandomFreq-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name = "mandl1",
+            num_fix_routes = 4,
+            num_flex_routes = 0,
+            max_route_length = 8,
+            total_vehicles = 99,
+            vehicles_per_additional_fixed_route = None,
+            random_vehicle_allocation = True,
+            **kwargs
+        ),
+    )
 
-gym.register(
-    id='MandlFlex-v0',
-    entry_point=lambda **kwargs: make_env(
-        network_name="mandl1",
-        num_flex_routes=99,
-        num_fix_routes=0,
-        total_vehicles=99,
-        max_route_length=75,
-        vehicle_capacity=50,
-        **kwargs
-    ),
-)
+    gym.register(
+        id='MandlFlex-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name="mandl1",
+            num_flex_routes=99,
+            num_fix_routes=0,
+            total_vehicles=99,
+            max_route_length=75,
+            vehicle_capacity=50,
+            **kwargs
+        ),
+    )
 
-gym.register(
-    id='MandlReplace-v0',
-    entry_point=lambda **kwargs: make_env(
-        network_name="mandl1",
-        solution_name="yoo2023with8stopsreplace",
-        allow_actions_fixed_routes=False,
-        num_flex_routes=33,
-        num_fix_routes=0,
-        max_route_length=75,
-        total_vehicles=99,
-        vehicle_capacity=50,
-        **kwargs
-    ),
-)
+    gym.register(
+        id='MandlReplace-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name="mandl1",
+            solution_name="yoo2023with8stopsreplace",
+            allow_actions_fixed_routes=False,
+            num_flex_routes=33,
+            num_fix_routes=0,
+            max_route_length=75,
+            total_vehicles=99,
+            vehicle_capacity=50,
+            **kwargs
+        ),
+    )
 
-gym.register(
-    id='CederReplace-v0',
-    entry_point=lambda **kwargs: make_env(
-        network_name="ceder1",
-        solution_name="Solution2a",
-        allow_actions_fixed_routes=False,
-        num_flex_routes=3,
-        num_fix_routes=0,
-        max_route_length=30,
-        total_vehicles=12,
-        vehicle_capacity=50,
-        **kwargs
-    ),
-)
+    gym.register(
+        id='CederReplace-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name="ceder1",
+            solution_name="Solution2a",
+            allow_actions_fixed_routes=False,
+            num_flex_routes=3,
+            num_fix_routes=0,
+            max_route_length=30,
+            total_vehicles=12,
+            vehicle_capacity=50,
+            **kwargs
+        ),
+    )
 
-gym.register(
-    id='Mumford0Fix-v0',
-    entry_point=lambda **kwargs: make_env(
-        network_name = "mumford0",
-        num_fix_routes = 12,
-        num_flex_routes = 0,
-        max_route_length = 8,
-        total_vehicles = 288,
-        **kwargs
-    ),
-)
+    gym.register(
+        id='Mumford0Fix-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name = "mumford0",
+            num_fix_routes = 12,
+            num_flex_routes = 0,
+            max_route_length = 8,
+            total_vehicles = 288,
+            **kwargs
+        ),
+    )
+except ImportError:
+    pass
