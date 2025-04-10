@@ -5,6 +5,8 @@ import optuna
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 from torch import nn as nn
 
+from rl_zoo3.utils import linear_schedule
+
 
 def convert_onpolicy_params(sampled_params: dict[str, Any]) -> dict[str, Any]:
     hyperparams = sampled_params.copy()
@@ -133,9 +135,9 @@ def sample_ppo_params(trial: optuna.Trial, n_actions: int, n_envs: int, addition
     activation_fn = trial.suggest_categorical("activation_fn", ["tanh", "relu"])
     # lr_schedule = "constant"
     # Uncomment to enable learning rate schedule
-    # lr_schedule = trial.suggest_categorical('lr_schedule', ['linear', 'constant'])
-    # if lr_schedule == "linear":
-    #     learning_rate = linear_schedule(learning_rate)
+    lr_schedule = trial.suggest_categorical('lr_schedule', ['linear', 'constant'])
+    if lr_schedule == "linear":
+        learning_rate = linear_schedule(learning_rate)
 
     # Display true values
     trial.set_user_attr("gamma", 1 - one_minus_gamma)

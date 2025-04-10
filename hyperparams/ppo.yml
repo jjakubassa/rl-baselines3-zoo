@@ -596,7 +596,7 @@ CederFix-v0: &ceder-default
         "ratio_travel_time_direct_to_shortest_path",
         "ratio_travel_time_transfers_to_shortest_path",))
     normalize: "{'norm_obs': False, 'norm_reward': True, 'gamma': 0.99, 'epsilon': 1e-8}"
-    n_envs: 8
+    n_envs: 80
     n_timesteps: !!float 5e6
     policy: "MultiInputPolicy"
     n_steps: 150
@@ -605,7 +605,7 @@ CederFix-v0: &ceder-default
     gamma: 0.99
     n_epochs: 10
     ent_coef: 0.01
-    learning_rate: !!float 3e-4
+    learning_rate: !!float 1e-4
     clip_range: 0.2
     vf_coef: 0.5
     max_grad_norm: 0.5
@@ -619,24 +619,32 @@ CederFix-v0: &ceder-default
 
 CederFlex-v0:
     <<: *ceder-default
+    n_envs: 60
 
 CederFixRandomFreq-v0:
     <<: *ceder-default
+    n_envs: 60
 
 CederReplace-v0:
     <<: *ceder-default
+    n_envs: 60
 
 MandlFix-v0:
     <<: *ceder-default
+    n_envs: 40
 
 MandlFixRandomFreq-v0:
     <<: *ceder-default
+    n_envs: 40
 
 MandlFlex-v0:
     <<: *ceder-default
+    n_envs: 40
 
 MandlReplace-v0:
     <<: *ceder-default
+    n_envs: 40
 
 Mumford0Fix-v0:
     <<: *ceder-default
+    n_envs: 40

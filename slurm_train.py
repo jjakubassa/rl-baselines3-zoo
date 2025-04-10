@@ -8,20 +8,20 @@ from typing import List
 class TrainingConfig:
     """Configuration for SLURM job submission of multiple training runs."""
     # SLURM configuration
-    partition: str = "single"
+    partition: str = "cpu"
     job_name: str = "rl_training"
-    cpus_per_task: int = 8
-    time_minutes: int = 60*48
-    mem_gb: str = "160G"
+    cpus_per_task: int = 96
+    time_minutes: str = "48:00:00"
+    mem_gb: str = "320G"
     gpus_per_node: int = 0
     nodes: int = 1  # Add number of nodes
     tasks_per_node: int = 1  # Add tasks per node
 
     # Experiment configuration
     algos: tuple[str, ...] = ("ppo",)
-    envs: tuple[str, ...] = ("MandlFix-v0", )
-    # ("CederFix-v0", "CederFlex-v0", "CederReplace-v0", "MandlFix-v0", "MandlFlex-v0", "MandlReplace-v0")
-    seeds: tuple[str, ...] = (1, 2, 3)
+    envs: tuple[str, ...] = ("MandlFixRandomFreq-v0", "CederFixRandomFreq-v0")
+    # ("CederFix-v0", "CederFlex-v0", "CederReplace-v0", "CederFixRandomFreq-v0", "MandlFix-v0", "MandlFlex-v0", "MandlReplace-v0", "MandlFixRandomFreq-v0" "Mumford0Fix-v0")
+    seeds: tuple[int, ...] = (1, 2, 3)
 
 def run_training(algo: str, env: str, seed: int):
     """Run a single training job."""
@@ -38,6 +38,17 @@ def run_training(algo: str, env: str, seed: int):
         "--wandb-project-name", "thesis",
         "--tensorboard-log", f"tensorboard/{algo}_{env}",
         "-f", f"logs/{algo}_{env}_seed{seed}",
+        "--save-freq", "500_000",
+        "-n", "20_000_000",
+        "--n-eval-envs", "16",
+
+        # HPO
+        "--optimize",
+        "--optimization-log-path", "./log_hpo",
+        "--max-total-trials", "100",
+        "--study-name", f"{env}-{algo}",
+        "--storage", f"./log_hpo/hpo-{env}-{algo}.log",
+        "--wandb-tags", "HPO",
     ]
 
     # Run the training

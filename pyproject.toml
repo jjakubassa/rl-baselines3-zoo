@@ -35,6 +35,7 @@ dependencies = [
     "gunicorn>=23.0.0",
     "gym==0.26.2",
     "huggingface-sb3>=3.0",
+    "jax[cuda12]>=0.5.3",
     "jumanji[train,mandl]",
     "moviepy>=1.0.0",
     "optuna-dashboard>=0.18.0",
