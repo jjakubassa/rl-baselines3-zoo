@@ -11,7 +11,7 @@ class TrainingConfig:
     partition: str = "cpu"
     job_name: str = "rl_training"
     cpus_per_task: int = 96
-    time_minutes: str = "48:00:00"
+    time_minutes: str = "24:00:00"
     mem_gb: str = "320G"
     gpus_per_node: int = 0
     nodes: int = 1  # Add number of nodes
@@ -22,6 +22,7 @@ class TrainingConfig:
     envs: tuple[str, ...] = ("MandlFixRandomFreq-v0", "CederFixRandomFreq-v0")
     # ("CederFix-v0", "CederFlex-v0", "CederReplace-v0", "CederFixRandomFreq-v0", "MandlFix-v0", "MandlFlex-v0", "MandlReplace-v0", "MandlFixRandomFreq-v0" "Mumford0Fix-v0")
     seeds: tuple[int, ...] = (1, 2, 3)
+
 
 def run_training(algo: str, env: str, seed: int):
     """Run a single training job."""
@@ -41,13 +42,14 @@ def run_training(algo: str, env: str, seed: int):
         "--save-freq", "500_000",
         "-n", "20_000_000",
         "--n-eval-envs", "16",
+        "--vec-env", "subproc"
 
         # HPO
         "--optimize",
         "--optimization-log-path", "./log_hpo",
         "--max-total-trials", "100",
         "--study-name", f"{env}-{algo}",
-        "--storage", f"./log_hpo/hpo-{env}-{algo}.log",
+        "--storage", f"./log_hpo/{env}/{algo}/hpo.log",
         "--wandb-tags", "HPO",
     ]
 
