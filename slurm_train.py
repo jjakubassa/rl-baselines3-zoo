@@ -14,21 +14,20 @@ class TrainingConfig:
     time_minutes: str = "24:00:00"
     mem_gb: str = "320G"
     gpus_per_node: int = 0
-    nodes: int = 1  # Add number of nodes
-    tasks_per_node: int = 1  # Add tasks per node
+    nodes: int = 1
+    tasks_per_node: int = 1
 
     # Experiment configuration
     algos: tuple[str, ...] = ("ppo",)
-    envs: tuple[str, ...] = ("MandlReplace-v0", "CederFlex-v0")
+    envs: tuple[str, ...] = ("CederFix-v0", "CederFlex-v0", "CederReplace-v0", "CederFixRandomFreq-v0", "MandlFix-v0", "MandlFlex-v0", "MandlReplace-v0", "MandlFixRandomFreq-v0", "Mumford0Fix-v0", "Mumford0FixRandomFreq-v0")
     # ("CederFix-v0", "CederFlex-v0", "CederReplace-v0", "CederFixRandomFreq-v0", "MandlFix-v0", "MandlFlex-v0", "MandlReplace-v0", "MandlFixRandomFreq-v0" "Mumford0Fix-v0", "Mumford0FixRandomFreq-v0")
-    seeds: tuple[int, ...] = (1, 2, 3)
+    seeds: tuple[int, ...] = (1, 2, 3,)
 
 def run_training(algo: str, env: str, seed: int):
     """Run a single training job."""
     from rl_zoo3.train import train
     import sys
 
-    # Set up command line arguments for the training script
     sys.argv = [
         "train.py",
         "--algo", algo,
@@ -42,14 +41,15 @@ def run_training(algo: str, env: str, seed: int):
         "-n", "10_000_000",
         "--n-eval-envs", "16",
         "--vec-env", "subproc"
+        "--wandb-tags", "freq",
 
         # HPO
-        "--optimize",
-        "--optimization-log-path", "./log_hpo",
-        "--max-total-trials", "100",
-        "--study-name", f"{env}-{algo}",
-        "--storage", f"./log_hpo/{env}/{algo}/hpo.log",
-        "--wandb-tags", "HPO",
+        # "--optimize",
+        # "--optimization-log-path", "./log_hpo",
+        # "--max-total-trials", "100",
+        # "--study-name", f"{env}-{algo}",
+        # "--storage", f"./log_hpo/{env}/{algo}/hpo.log",
+        # "--wandb-tags", "HPO",
     ]
 
     # Run the training
