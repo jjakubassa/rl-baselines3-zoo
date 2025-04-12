@@ -233,5 +233,20 @@ try:
             **kwargs
         ),
     )
+
+    gym.register(
+        id='Mumford0FixRandomFreq-v0',
+        entry_point=lambda **kwargs: make_env(
+            network_name = "mumford0",
+            num_fix_routes = 12,
+            num_flex_routes = 0,
+            max_route_length = 8,
+            total_vehicles = 288,
+            vehicles_per_additional_fixed_route = None,
+            random_vehicle_allocation = True,
+            **kwargs
+        ),
+    )
+
 except ImportError:
     pass
