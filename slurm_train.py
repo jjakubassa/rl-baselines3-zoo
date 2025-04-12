@@ -10,7 +10,7 @@ class TrainingConfig:
     # SLURM configuration
     partition: str = "cpu"
     job_name: str = "rl_training"
-    cpus_per_task: int = 96
+    cpus_per_task: int = 32
     time_minutes: str = "24:00:00"
     mem_gb: str = "320G"
     gpus_per_node: int = 0
@@ -19,10 +19,9 @@ class TrainingConfig:
 
     # Experiment configuration
     algos: tuple[str, ...] = ("ppo",)
-    envs: tuple[str, ...] = ("MandlFixRandomFreq-v0", "CederFixRandomFreq-v0")
-    # ("CederFix-v0", "CederFlex-v0", "CederReplace-v0", "CederFixRandomFreq-v0", "MandlFix-v0", "MandlFlex-v0", "MandlReplace-v0", "MandlFixRandomFreq-v0" "Mumford0Fix-v0")
+    envs: tuple[str, ...] = ("MandlReplace-v0", "CederFlex-v0")
+    # ("CederFix-v0", "CederFlex-v0", "CederReplace-v0", "CederFixRandomFreq-v0", "MandlFix-v0", "MandlFlex-v0", "MandlReplace-v0", "MandlFixRandomFreq-v0" "Mumford0Fix-v0", "Mumford0FixRandomFreq-v0")
     seeds: tuple[int, ...] = (1, 2, 3)
-
 
 def run_training(algo: str, env: str, seed: int):
     """Run a single training job."""
@@ -40,7 +39,7 @@ def run_training(algo: str, env: str, seed: int):
         "--tensorboard-log", f"tensorboard/{algo}_{env}",
         "-f", f"logs/{algo}_{env}_seed{seed}",
         "--save-freq", "500_000",
-        "-n", "20_000_000",
+        "-n", "10_000_000",
         "--n-eval-envs", "16",
         "--vec-env", "subproc"
 
