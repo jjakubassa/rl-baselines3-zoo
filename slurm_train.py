@@ -40,7 +40,7 @@ def run_training(algo: str, env: str, seed: int):
         "--save-freq", "500_000",
         "-n", "10_000_000",
         "--n-eval-envs", "16",
-        "--vec-env", "subproc"
+        "--vec-env", "subproc",
         "--wandb-tags", "freq",
 
         # HPO
