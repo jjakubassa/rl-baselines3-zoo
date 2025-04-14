@@ -117,135 +117,137 @@ try:
     gym.register(
         id='CederFix-v0',
         entry_point=lambda **kwargs: make_env(
-            network_name="ceder1",
-            num_flex_routes=0,
-            num_fix_routes=3,
-            max_route_length=3,
-            total_vehicles=12,
-            **kwargs
+            **{
+                "network_name": "ceder1",
+                "num_flex_routes": 0,
+                "num_fix_routes": 3,
+                "max_route_length": 3,
+                "total_vehicles": 12,
+                **kwargs
+            }
         ),
     )
 
     gym.register(
         id='CederFixRandomFreq-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name="ceder1",
-            num_flex_routes=0,
-            num_fix_routes=3,
-            max_route_length=3,
-            total_vehicles=12,
-            vehicles_per_additional_fixed_route = None,
-            random_vehicle_allocation = True,
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "ceder1",
+            "num_flex_routes": 0,
+            "num_fix_routes": 3,
+            "max_route_length": 3,
+            "total_vehicles": 12,
+            "vehicles_per_additional_fixed_route": None,
+            "random_vehicle_allocation": True,
             **kwargs
-        ),
+        }),
     )
 
     gym.register(
         id='CederFlex-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name="ceder1",
-            num_flex_routes=12,
-            num_fix_routes=0,
-            max_route_length=30,
-            total_vehicles=12,
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "ceder1",
+            "num_flex_routes": 12,
+            "num_fix_routes": 0,
+            "max_route_length": 30,
+            "total_vehicles": 12,
             **kwargs
-        ),
+        }),
     )
 
     gym.register(
         id='MandlFix-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name = "mandl1",
-            num_fix_routes = 4,
-            num_flex_routes = 0,
-            max_route_length = 8,
-            total_vehicles = 99,
-            vehicles_per_additional_fixed_route = (14, 26, 29, 30),
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "mandl1",
+            "num_fix_routes": 4,
+            "num_flex_routes": 0,
+            "max_route_length": 8,
+            "total_vehicles": 99,
+            "vehicles_per_additional_fixed_route": (14, 26, 29, 30),
             **kwargs
-        ),
+        }),
     )
 
     gym.register(
         id='MandlFixRandomFreq-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name = "mandl1",
-            num_fix_routes = 4,
-            num_flex_routes = 0,
-            max_route_length = 8,
-            total_vehicles = 99,
-            vehicles_per_additional_fixed_route = None,
-            random_vehicle_allocation = True,
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "mandl1",
+            "num_fix_routes": 4,
+            "num_flex_routes": 0,
+            "max_route_length": 8,
+            "total_vehicles": 99,
+            "vehicles_per_additional_fixed_route": None,
+            "random_vehicle_allocation": True,
             **kwargs
-        ),
+        }),
     )
 
     gym.register(
         id='MandlFlex-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name="mandl1",
-            num_flex_routes=99,
-            num_fix_routes=0,
-            total_vehicles=99,
-            max_route_length=75,
-            vehicle_capacity=50,
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "mandl1",
+            "num_flex_routes": 99,
+            "num_fix_routes": 0,
+            "total_vehicles": 99,
+            "max_route_length": 75,
+            "vehicle_capacity": 50,
             **kwargs
-        ),
+        }),
     )
 
     gym.register(
         id='MandlReplace-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name="mandl1",
-            solution_name="yoo2023with8stopsreplace",
-            allow_actions_fixed_routes=False,
-            num_flex_routes=33,
-            num_fix_routes=0,
-            max_route_length=75,
-            total_vehicles=99,
-            vehicle_capacity=50,
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "mandl1",
+            "solution_name": "yoo2023with8stopsreplace",
+            "allow_actions_fixed_routes": False,
+            "num_flex_routes": 33,
+            "num_fix_routes": 0,
+            "max_route_length": 75,
+            "total_vehicles": 99,
+            "vehicle_capacity": 50,
             **kwargs
-        ),
+        }),
     )
 
     gym.register(
         id='CederReplace-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name="ceder1",
-            solution_name="Solution2a",
-            allow_actions_fixed_routes=False,
-            num_flex_routes=3,
-            num_fix_routes=0,
-            max_route_length=30,
-            total_vehicles=12,
-            vehicle_capacity=50,
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "ceder1",
+            "solution_name": "Solution2a",
+            "allow_actions_fixed_routes": False,
+            "num_flex_routes": 3,
+            "num_fix_routes": 0,
+            "max_route_length": 30,
+            "total_vehicles": 12,
+            "vehicle_capacity": 50,
             **kwargs
-        ),
+        }),
     )
 
     gym.register(
         id='Mumford0Fix-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name = "mumford0",
-            num_fix_routes = 12,
-            num_flex_routes = 0,
-            max_route_length = 8,
-            total_vehicles = 288,
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "mumford0",
+            "num_fix_routes": 12,
+            "num_flex_routes": 0,
+            "max_route_length": 8,
+            "total_vehicles": 288,
             **kwargs
-        ),
+        }),
     )
 
     gym.register(
         id='Mumford0FixRandomFreq-v0',
-        entry_point=lambda **kwargs: make_env(
-            network_name = "mumford0",
-            num_fix_routes = 12,
-            num_flex_routes = 0,
-            max_route_length = 8,
-            total_vehicles = 288,
-            vehicles_per_additional_fixed_route = None,
-            random_vehicle_allocation = True,
+        entry_point=lambda **kwargs: make_env(**{
+            "network_name": "mumford0",
+            "num_fix_routes": 12,
+            "num_flex_routes": 0,
+            "max_route_length": 8,
+            "total_vehicles": 288,
+            "vehicles_per_additional_fixed_route": None,
+            "random_vehicle_allocation": True,
             **kwargs
-        ),
+        }),
     )
 
 except ImportError:
