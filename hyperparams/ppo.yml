@@ -616,6 +616,8 @@ CederFix-v0: &ceder-default
         activation_fn=nn.ReLU,
         ortho_init=True
         )"
+    callback:
+        - rl_zoo3.custom_callbacks.SimpleVehicleUtilizationCallback
 
 CederFlex-v0:
     <<: *ceder-default
