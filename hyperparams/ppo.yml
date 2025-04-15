@@ -650,3 +650,7 @@ MandlReplace-v0:
 Mumford0Fix-v0:
     <<: *ceder-default
     n_envs: 80
+
+Mumford0FixRandomFreq-v0:
+    <<: *ceder-default
+    n_envs: 80
