@@ -86,11 +86,12 @@ def plot_train():
             x, y_mean = window_func(x, y, args.episode_window, np.mean)
             plt.plot(x, y_mean, linewidth=2, label=folder.split("/")[-1])
 
+        data_frame.to_csv(f"data/{folder}.csv")
+
     plt.legend()
     plt.tight_layout()
     plt.show()
-    plt.save("example.png")
-
+    plt.savefig('training_plot.png')
 
 if __name__ == "__main__":
     plot_train()

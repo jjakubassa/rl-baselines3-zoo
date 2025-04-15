@@ -2,6 +2,7 @@ import argparse
 import importlib
 import os
 import sys
+from typing import Optional
 
 import numpy as np
 import torch as th
@@ -15,9 +16,9 @@ from rl_zoo3 import ALGOS, create_test_env, get_saved_hyperparams
 from rl_zoo3.exp_manager import ExperimentManager
 from rl_zoo3.load_from_hub import download_from_hub
 from rl_zoo3.utils import StoreDict, get_model_path
+import pandas as pd
 
-
-def enjoy() -> None:  # noqa: C901
+def enjoy() -> Optional[pd.DataFrame]:  # noqa: C901
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", help="environment ID", type=EnvironmentName, default="CartPole-v1")
     parser.add_argument("-f", "--folder", help="Log folder", type=str, default="rl-trained-agents")
@@ -223,6 +224,7 @@ def enjoy() -> None:  # noqa: C901
         generator = tqdm(generator)
 
     try:
+        episodes_data = []
         for _ in generator:
             action, lstm_states = model.predict(
                 obs,  # type: ignore[arg-type]
@@ -267,6 +269,34 @@ def enjoy() -> None:  # noqa: C901
                     if infos[0].get("is_success") is not None:
                         successes.append(infos[0].get("is_success", False))
                         episode_reward, ep_len = 0.0, 0
+
+                # my tracking
+                if done:
+                    term_obs = infos[0].pop("terminal_observation")
+                    episode_infos = infos[0].pop("episode")
+
+                    episode_data = {
+                        'episode': len(episodes_data) + 1,
+                        'route_types': term_obs["route_types"],
+                        'num_routes': term_obs["num_routes"],
+                        'route_stops': term_obs["route_stops"].reshape(term_obs["num_routes"], -1),
+                        'route_frequencies': term_obs["route_frequencies"],
+                        'episode_reward': episode_infos.pop('r'),
+                        'episode_length': episode_infos.pop('l'),
+                        'episode_time': episode_infos.pop('t'),
+                    }
+                    episode_data.update(infos[0])
+                    episodes_data.append(episode_data)
+
+        df = pd.DataFrame(episodes_data)
+        df["algo"] = args.algo
+        df["env"] = args.env
+        df["eval_seed"] = args.seed
+        df["deterministic"] = deterministic
+        df["model_path"] = model_path
+        df["env_kwargs"] = env_kwargs
+
+        return df
 
     except KeyboardInterrupt:
         pass
