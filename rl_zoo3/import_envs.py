@@ -116,16 +116,14 @@ try:
 
     gym.register(
         id='CederFix-v0',
-        entry_point=lambda **kwargs: make_env(
-            **{
-                "network_name": "ceder1",
-                "num_flex_routes": 0,
-                "num_fix_routes": 3,
-                "max_route_length": 3,
-                "total_vehicles": 12,
-                **kwargs
-            }
-        ),
+        entry_point=make_env,
+        kwargs={
+            "network_name": "ceder1",
+            "num_flex_routes": 0,
+            "num_fix_routes": 3,
+            "max_route_length": 3,
+            "total_vehicles": 12,
+        }
     )
 
     gym.register(
