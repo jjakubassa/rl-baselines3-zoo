@@ -1,15 +1,12 @@
-import os
 import submitit
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
 
 @dataclass
 class TrainingConfig:
     """Configuration for SLURM job submission of multiple training runs."""
     # SLURM configuration
     partition: str = "cpu"
-    job_name: str = "rl_training"
     cpus_per_task: int = 96
     time_minutes: str = "48:00:00"
     mem_gb: str = "320G"
@@ -72,7 +69,6 @@ def main():
         nodes=1,
         tasks_per_node=config.tasks_per_node,
         cpus_per_task=config.cpus_per_task,
-        slurm_job_name=config.job_name,
         slurm_cpus_per_task=config.cpus_per_task,
         slurm_time=config.time_minutes,
         slurm_mem=config.mem_gb,
@@ -89,6 +85,7 @@ def main():
         for env in config.envs:
             for seed in config.seeds:
                 # Submit the job
+                executor.update_parameters(slurm_job_name=env)
                 job = executor.submit(run_training, algo, env, seed)
                 jobs.append((algo, env, seed, job))
                 print(f"Submitted job {job.job_id}: {algo} on {env} with seed {seed}")
