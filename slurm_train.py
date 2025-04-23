@@ -8,7 +8,7 @@ class TrainingConfig:
     # SLURM configuration
     partition: str = "cpu"
     cpus_per_task: int = 96
-    time_minutes: str = "48:00:00"
+    time_minutes: str = "8:00:00"
     mem_gb: str = "320G"
     gpus_per_node: int = 0
     nodes: int = 1
@@ -16,9 +16,9 @@ class TrainingConfig:
 
     # Experiment configuration
     algos: tuple[str, ...] = ("ppo",)
-    envs: tuple[str, ...] = ("CederFlex-v0", "CederReplace-v0", "MandlFlex-v0", "MandlReplace-v0")
+    envs: tuple[str, ...] = ("Mandl-v0", )
     # ("CederFix-v0", "CederFlex-v0", "CederReplace-v0", "CederFixRandomFreq-v0", "MandlFix-v0", "MandlFlex-v0", "MandlReplace-v0", "MandlFixRandomFreq-v0" "Mumford0Fix-v0", "Mumford0FixRandomFreq-v0")
-    seeds: tuple[int, ...] = (1, 2, 3,)
+    seeds: tuple[int, ...] = (1, )
 
 def run_training(algo: str, env: str, seed: int):
     """Run a single training job."""
@@ -35,10 +35,52 @@ def run_training(algo: str, env: str, seed: int):
         "--tensorboard-log", f"tensorboard/{algo}_{env}",
         "-f", f"logs/{algo}_{env}_seed{seed}",
         "--save-freq", "500_000",
-        "-n", "100_000_000",
+        "-n", "10_000_000",
         "--n-eval-envs", "16",
         "--vec-env", "subproc",
-        "--wandb-tags", "freq",
+        "--wandb-tags", "pareto",
+        "--env-kwargs", "num_fix_routes:4", "total_vehicles:66",
+        # "--env-kwargs", "num_fix_routes:4", "total_vehicles:76",
+        # "--env-kwargs", "num_fix_routes:4", "total_vehicles:99",
+        # "--env-kwargs", "num_fix_routes:10", "total_vehicles:66",
+        # "--env-kwargs", "num_fix_routes:10", "total_vehicles:76",
+        # "--env-kwargs", "num_fix_routes:10", "total_vehicles:99",
+        # "--env-kwargs", "num_fix_routes:12", "total_vehicles:66",
+        # "--env-kwargs", "num_fix_routes:12", "total_vehicles:76",
+        # "--env-kwargs", "num_fix_routes:12", "total_vehicles:99",
+        # "--env-kwargs", "num_fix_routes:6", "total_vehicles:66",
+        # "--env-kwargs", "num_fix_routes:6", "total_vehicles:71",
+        # "--env-kwargs", "num_fix_routes:6", "total_vehicles:76",
+        # "--env-kwargs", "num_fix_routes:6", "total_vehicles:83",
+        # "--env-kwargs", "num_fix_routes:6", "total_vehicles:90",
+        # "--env-kwargs", "num_fix_routes:6", "total_vehicles:99",
+        # "--env-kwargs", "num_fix_routes:7", "total_vehicles:66",
+        # "--env-kwargs", "num_fix_routes:7", "total_vehicles:71",
+        # "--env-kwargs", "num_fix_routes:7", "total_vehicles:76",
+        # "--env-kwargs", "num_fix_routes:7", "total_vehicles:83",
+        # "--env-kwargs", "num_fix_routes:7", "total_vehicles:90",
+        # "--env-kwargs", "num_fix_routes:7", "total_vehicles:99",
+        # "--env-kwargs", "num_fix_routes:8", "total_vehicles:66",
+        # "--env-kwargs", "num_fix_routes:8", "total_vehicles:71",
+        # "--env-kwargs", "num_fix_routes:8", "total_vehicles:76",
+        # "--env-kwargs", "num_fix_routes:8", "total_vehicles:83",
+        # "--env-kwargs", "num_fix_routes:8", "total_vehicles:90",
+        # "--env-kwargs", "num_fix_routes:8", "total_vehicles:99",
+        # "--env-kwargs", "num_fix_routes:11", "total_vehicles:66",
+        # "--env-kwargs", "num_fix_routes:11", "total_vehicles:71",
+        # "--env-kwargs", "num_fix_routes:11", "total_vehicles:76",
+        # "--env-kwargs", "num_fix_routes:11", "total_vehicles:83",
+        # "--env-kwargs", "num_fix_routes:11", "total_vehicles:90",
+        # "--env-kwargs", "num_fix_routes:11", "total_vehicles:99",
+        # "--env-kwargs", "num_fix_routes:4", "total_vehicles:71",
+        # "--env-kwargs", "num_fix_routes:4", "total_vehicles:83",
+        # "--env-kwargs", "num_fix_routes:4", "total_vehicles:90",
+        # "--env-kwargs", "num_fix_routes:10", "total_vehicles:71",
+        # "--env-kwargs", "num_fix_routes:10", "total_vehicles:83",
+        # "--env-kwargs", "num_fix_routes:10", "total_vehicles:90",
+        # "--env-kwargs", "num_fix_routes:12", "total_vehicles:71",
+        # "--env-kwargs", "num_fix_routes:12", "total_vehicles:83",
+        # "--env-kwargs", "num_fix_routes:12", "total_vehicles:90",
 
         # HPO
         # "--optimize",

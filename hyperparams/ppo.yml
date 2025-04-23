@@ -654,3 +654,7 @@ Mumford0Fix-v0:
 Mumford0FixRandomFreq-v0:
     <<: *ceder-default
     n_envs: 80
+
+Mandl-v0:
+    <<: *ceder-default
+    n_envs: 80

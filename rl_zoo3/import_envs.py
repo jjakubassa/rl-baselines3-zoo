@@ -240,5 +240,20 @@ try:
             "random_vehicle_allocation": True,
         })
 
+    # intentend to be used with overwrites
+    # mostly seperate for organization of logs
+    gym.register(
+        id='Mandl-v0',
+        entry_point=make_env,
+        kwargs = {
+            "network_name": "mandl1",
+            "num_fix_routes": 4,
+            "num_flex_routes": 0,
+            "max_route_length": 8,
+            "total_vehicles": 99,
+            "vehicles_per_additional_fixed_route": None,
+            "random_vehicle_allocation": True,
+        })
+
 except ImportError:
     pass
