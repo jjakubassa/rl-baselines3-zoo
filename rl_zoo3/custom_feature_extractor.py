@@ -176,3 +176,186 @@ class MandlFeaturesExtractor(BaseFeaturesExtractor):
         combined = th.cat(encoded_tensors, dim=1)
 
         return self.combination_layer(combined)
+
+class SmallMandlFeaturesExtractor(BaseFeaturesExtractor):
+    """
+    Lighter feature extractor for Mandl/Ceder/Mumford environments.
+    Still does 2-layer (MLP+LayerNorm) per feature, and a 2-layer combiner.
+    """
+    def __init__(self, observation_space: gym.spaces.Dict, features_dim: int = 128):
+        super().__init__(observation_space, features_dim)
+
+        self.num_routes = observation_space.spaces["route_frequencies"].shape[0]
+        self.num_nodes = observation_space.spaces["is_terminal"].shape[0]
+        self.num_vehicles = observation_space.spaces["fleet_positions"].shape[0]
+        self.max_route_length = observation_space.spaces["route_stops"].shape[0] // self.num_routes
+
+        action_mask_size = self.num_routes * (self.num_nodes + 1)
+        travel_times_size = self.num_nodes * self.num_nodes
+        route_stops_size = self.num_routes * self.max_route_length
+        fleet_positions_size = self.num_vehicles
+
+        def small_mlp(in_dim, out_dim):
+            return nn.Sequential(
+                nn.Linear(in_dim, 64), nn.LayerNorm(64), nn.ReLU(),
+                nn.Linear(64, out_dim), nn.LayerNorm(out_dim), nn.ReLU(),
+            )
+
+        # 64 for big matrices, 32 for vectors
+        self.extractors = nn.ModuleDict({
+            "action_mask":          small_mlp(action_mask_size, 64),
+            "travel_times":         small_mlp(travel_times_size, 64),
+            "direct_travel_times":  small_mlp(travel_times_size, 64),
+            "transfer_travel_times":small_mlp(travel_times_size, 64),
+            "network_shortest_times":small_mlp(travel_times_size, 64),
+            "route_stops":          small_mlp(route_stops_size, 64),
+            "fleet_positions":      small_mlp(fleet_positions_size, 32),
+            "route_types":          small_mlp(self.num_routes, 32),
+            "route_frequencies":    small_mlp(self.num_routes, 32),
+            "is_terminal":          small_mlp(self.num_nodes, 32),
+        })
+
+        self.scalar_features = [
+            "current_time",
+            "max_route_length",
+            "num_fix_routes",
+            "num_flex_routes",
+            "num_nodes",
+            "num_routes",
+            "num_vehicles",
+        ]
+        self.scalar_extractor = small_mlp(len(self.scalar_features), 16)
+
+        total_features = (6 * 64) + (4 * 32) + 16
+
+        self.combination_layer = nn.Sequential(
+            nn.Linear(total_features, 128),
+            nn.LayerNorm(128), nn.ReLU(),
+            nn.Linear(128, features_dim),
+            nn.LayerNorm(features_dim), nn.Tanh()
+        )
+
+        self.inf_replacement = 200_000.0
+
+    def forward(self, observations: dict[str, th.Tensor]) -> th.Tensor:
+        encoded_tensors = []
+
+        # Scalars
+        scalar_values = [observations[k].unsqueeze(-1) if observations[k].dim() == 1 else observations[k]
+                         for k in self.scalar_features]
+        scalar_tensor = th.cat(scalar_values, dim=1)
+        encoded_tensors.append(self.scalar_extractor(scalar_tensor))
+
+        # Main features
+        for key, extractor in self.extractors.items():
+            if key in observations:
+                x = observations[key].float()
+                if "travel_times" in key or "network_shortest_times" in key:
+                    x = th.where(th.isinf(x), th.tensor(self.inf_replacement, device=x.device), x)
+                    x = th.where(th.isnan(x), th.tensor(self.inf_replacement, device=x.device), x)
+                    x = th.clamp(x, 0.0, self.inf_replacement)
+                    x = x / self.inf_replacement
+                if x.dim() == 1:
+                    x = x.unsqueeze(0)
+                x = x.reshape(x.size(0), -1)
+                encoded_tensors.append(extractor(x))
+
+        combined = th.cat(encoded_tensors, dim=1)
+        return self.combination_layer(combined)
+
+class DeepMandlFeaturesExtractor(BaseFeaturesExtractor):
+    """
+    Feature extractor for Mandl/Ceder/Mumford large environments.
+    Deeper MLPs per feature, and deeper combined MLP for high capacity.
+    """
+
+    def __init__(self, observation_space: gym.spaces.Dict, features_dim: int = 256):
+        super().__init__(observation_space, features_dim)    # <--- SB3 API, sets self.features_dim
+
+        # Calculate dimensions
+        self.num_routes = observation_space.spaces["route_frequencies"].shape[0]
+        self.num_nodes = observation_space.spaces["is_terminal"].shape[0]
+        self.num_vehicles = observation_space.spaces["fleet_positions"].shape[0]
+        self.max_route_length = observation_space.spaces["route_stops"].shape[0] // self.num_routes
+
+        action_mask_size = self.num_routes * (self.num_nodes + 1)
+        travel_times_size = self.num_nodes * self.num_nodes
+        route_stops_size = self.num_routes * self.max_route_length
+        fleet_positions_size = self.num_vehicles
+        route_types_size = self.num_routes
+        route_frequencies_size = self.num_routes
+        is_terminal_size = self.num_nodes
+
+        # Deeper per-feature MLPs (3 layers)
+        def layered_mlp(inf, outf):
+            return nn.Sequential(
+                nn.Linear(inf, 128), nn.LayerNorm(128), nn.ReLU(),
+                nn.Linear(128, 128), nn.LayerNorm(128), nn.ReLU(),
+                nn.Linear(128, outf), nn.LayerNorm(outf), nn.ReLU(),
+            )
+
+        self.extractors = nn.ModuleDict({
+            "action_mask": layered_mlp(action_mask_size, 128),
+            "travel_times": layered_mlp(travel_times_size, 128),
+            "direct_travel_times": layered_mlp(travel_times_size, 128),
+            "transfer_travel_times": layered_mlp(travel_times_size, 128),
+            "network_shortest_times": layered_mlp(travel_times_size, 128),
+            "route_stops": layered_mlp(route_stops_size, 128),
+            "fleet_positions": layered_mlp(fleet_positions_size, 64),
+            "route_types": layered_mlp(route_types_size, 64),
+            "route_frequencies": layered_mlp(route_frequencies_size, 64),
+            "is_terminal": layered_mlp(is_terminal_size, 64),
+        })
+
+        # Scalar features
+        self.scalar_features = [
+            "current_time",
+            "max_route_length",
+            "num_fix_routes",
+            "num_flex_routes",
+            "num_nodes",
+            "num_routes",
+            "num_vehicles",
+        ]
+        self.scalar_extractor = layered_mlp(len(self.scalar_features), 32)
+
+        # Total features (6*128 + 4*64 + 32)
+        total_features = (6 * 128) + (4 * 64) + 32
+
+        # Deep combination MLP block (3 layers before output)
+        self.combination_layer = nn.Sequential(
+            nn.Linear(total_features, 512),
+            nn.LayerNorm(512), nn.ReLU(),
+            nn.Linear(512, 256),
+            nn.LayerNorm(256), nn.ReLU(),
+            nn.Linear(256, features_dim),
+            nn.LayerNorm(features_dim), nn.Tanh()
+        )
+
+        self.inf_replacement = 200_000.0
+
+    def forward(self, observations: dict[str, th.Tensor]) -> th.Tensor:
+        encoded_tensors = []
+
+        # Scalar features
+        scalar_features = [observations[k].unsqueeze(-1) if observations[k].dim() == 1 else observations[k]
+                           for k in self.scalar_features]
+        scalar_features = th.cat(scalar_features, dim=1)
+        encoded_tensors.append(self.scalar_extractor(scalar_features))
+
+        # Main features
+        for key, extractor in self.extractors.items():
+            if key in observations:
+                x = observations[key].float()
+                if "travel_times" in key or "network_shortest_times" in key:
+                    x = th.where(th.isinf(x), th.tensor(self.inf_replacement, device=x.device), x)
+                    x = th.where(th.isnan(x), th.tensor(self.inf_replacement, device=x.device), x)
+                    x = th.clamp(x, 0.0, self.inf_replacement)
+                    x = x / self.inf_replacement
+                if x.dim() == 1:
+                    x = x.unsqueeze(0)
+                x = x.reshape(x.size(0), -1)
+                encoded_tensors.append(extractor(x))
+
+        combined = th.cat(encoded_tensors, dim=1)
+        return self.combination_layer(combined)

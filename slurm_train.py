@@ -8,7 +8,7 @@ class TrainingConfig:
     # SLURM configuration
     partition: str = "cpu"
     cpus_per_task: int = 96
-    time_minutes: str = "8:00:00"
+    time_minutes: str = "32:00:00"
     mem_gb: str = "320G"
     gpus_per_node: int = 0
     nodes: int = 1
@@ -38,14 +38,14 @@ def run_training(algo: str, env: str, seed: int):
         "-n", "10_000_000",
         "--n-eval-envs", "16",
         "--vec-env", "subproc",
-        "--wandb-tags", "pareto",
-        "--env-kwargs", "num_fix_routes:4", "total_vehicles:66",
+        "--wandb-tags", "deeper",
+        # "--env-kwargs", "num_fix_routes:4", "total_vehicles:66",
         # "--env-kwargs", "num_fix_routes:4", "total_vehicles:76",
         # "--env-kwargs", "num_fix_routes:4", "total_vehicles:99",
         # "--env-kwargs", "num_fix_routes:10", "total_vehicles:66",
         # "--env-kwargs", "num_fix_routes:10", "total_vehicles:76",
         # "--env-kwargs", "num_fix_routes:10", "total_vehicles:99",
-        # "--env-kwargs", "num_fix_routes:12", "total_vehicles:66",
+        "--env-kwargs", "num_fix_routes:12", "total_vehicles:66",
         # "--env-kwargs", "num_fix_routes:12", "total_vehicles:76",
         # "--env-kwargs", "num_fix_routes:12", "total_vehicles:99",
         # "--env-kwargs", "num_fix_routes:6", "total_vehicles:66",
